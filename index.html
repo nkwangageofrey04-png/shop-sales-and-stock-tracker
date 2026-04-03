@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <style>
+        body{margin: 0; padding: 0; background: #f4f4f4;}
+        .container{display: flex; flex-direction: column; justify-content: center; 
+        height: 300px; width: 300px; margin: 100px auto; padding: 20px;
+    background: white; border-radius: 5px;}
+        h4,h3{ font-size: 14PX; font-family:sans-serif;}
+        label{padding-bottom: -25px;}
+        input{ border: none; border-bottom: 2px solid grey; outline: none;}
+        button{border-radius: 8px; padding: 10px;}
+        h3{font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva;}
+
+    </style>
+    <title>Stock Login</title>
+</head>
+<body>
+<form id="login">
+<div class="main-container">
+<div class="container">
+    <h3>Hello welcome to the stock managment app,</h3>
+    <h4>please signin</h4>
+    <label>Username</label>
+    <br>
+    <input id="userName">
+    <br>
+    <label>Password</label>
+    <br>
+    <input id="password">
+    <h4>Forgot your Password?</h4>
+    <button type="submit">Sign in</button>
+</div>
+</div>
+</form>
+</body>
+<script>
+    document.getElementById("login").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    let userName = document.getElementById("userName").value.trim();
+    let password = document.getElementById("password").value.trim();
+
+    const users = {
+        "hellen@1": "nkwanga",
+        "isaac@2": "nkwanga"
+    };
+
+    if (users[userName] && users[userName] === password) {
+
+        localStorage.setItem("loggedInUser", userName);
+
+        alert("Signin successful!");
+        console.log("Logged in as:", userName);
+
+        window.location.href = "busines.html";
+
+    } else {
+        alert("Username or password is incorrect");
+    }
+});
+
+   
+
+</script>
+</html>
