@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 200px;
+            width: 300px;
+            margin: auto;
+            background-color: #ededf1;
+        }
+
+        input {
+            margin-top: -15px;
+            border-radius: 4px;
+        }
+
+        label {
+            margin-top: -5px;
+            font-size: 20px;
+            font-style: normal;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        select {
+            margin-top: -15px;
+            border-radius: 3px;
+        }
+
+        button {
+            margin-bottom: 20px;
+            border-radius: 10px;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Shop Sales & Stock Tracker</h2>
+    <label>Product Name</label>
+    <br>
+    <select id="name" onchange="updatePrice()">
+        <option>select</option>
+        <option>POP10C</option>
+        <option>POP20(64)</option>
+        <option>POP20(128)</option>
+        <option>SPARK40(128)</option>
+        <option>SPARK40PRO</option>
+        <option>SPARK40PRO+</option>
+        <option>CAMON50</option>
+        <option>CAMON50PRO</option>
+        <option>SMART10</option>
+        <option>SMART10+</option>
+        <option>HOT60I</option>
+        <option>HOT40PRO</option>
+        <option>REDMI A5(64)</option>
+        <option>REDMI A5(128)</option>
+        <option>REDMI 15C(128)</option>
+        <option>REDMI 15C(256)</option>
+        <option>T485</option>
+        <option>T403</option>
+        <option>T528</option>
+        <option>T352</option>
+        <option>T102</option>
+        <option>T101</option>
+        <option>T315</option>
+        <option>T353</option>
+        <option>T302</option>
+        <option>T303</option>
+        <option>T316</option>
+        <option>T455</option>
+        <option>T313</option>
+        <option>ITEL 2163</option>
+        <option>ITEL 2165</option>
+        <option>ITEL 2176</option>
+        <option>ITEL 3010</option>
+        <option>ITEL 5027</option>
+        <option>ITEL 5032</option>
+        <option>ITEL A100C(128)</option>
+        <option>ITEL A06</option>
+        <option>ITEL A100C(64)</option>
+        <option>ITEL A90(128)</option>
+        <option>ITEL SIGNAL 10</option>
+        <option>ITEL 5606</option>
+        <option>ITEL 5627</option>
+        <option>ITEL 2160</option>
+        <option>CALL BOX</option>
+        <option>TECNO POWER BANK 10000mAh</option>
+        <option>TECNO POWER BANK 20000mAh</option>
+        <option>BUD 4AIR</option>
+        <option>SMART USB TECNO</option>
+        <option>TYPE C USB TECNO</option>
+        <option>SMART WATCH TECNO</option>
+        <option>TECNO FOLDABLE CHARGER</option>
+        <option>33W TECNO CHARGER</option>
+        <option>ITEL 5W CHARGER</option>
+        <option>ITEL 18W CHARGER</option>
+        <option>ITEL EARPHONES</option>
+        <option>H2 SCREEN GUARD</option>
+        <option>GLASS SCREEN GUARD</option>
+        <option>STICKERS</option>
+        <option>COVERS</option>
+    </select>
+    <br>
+    <label>Available</label>
+    <br>
+    <input placeholder="Balance" id="balance" readonly>
+    <br>
+    <label>Buying Price</label>
+    <br>
+    <input type="number" id="buying" placeholder="Price" readonly>
+    <br>
+
+    <label>Quantity Added</label>
+    <br>
+    <input type="number" id="added" placeholder="Quantity">
+    <br>
+    <label>Selling Price</label>
+    <br>
+    <input type="number" id="selling" placeholder="Price" readonly>
+
+    <br>
+    <label>Quantity Sold</label>
+    <br>
+    <input placeholder="Quantity" id="sold" type="number">
+    <br>
+    <label>Additional Expenses</label>
+    <br>
+    <input type="text" id="expenses" placeholder="Total Expenses">
+    <br>
+    <button type="button" onclick="calculate()">Enter</button>
+    <br>
+    <label>Product Remaining</label>
+    <br>
+    <input placeholder="Total Product" id="remaining" readonly>
+    <br> 
+    <label>Amount Used</label>
+    <br>
+    <input type="text" placeholder="To Buy Stock" id="amountUsed" readonly>
+    <br>
+    <label>Amount Earned</label>
+    <br>
+    <input placeholder="Sales" id="amountEarned" type="text" readonly>
+    <br>
+    <button type="button" onclick="shopCalculation(),saveShopValue(), saveProduct()">Submit</button>
+    <h3>Shop Value Calculation</h3>
+    <label>Stock Available</label>
+    <br>
+    <input placeholder="Total" type="number" id="total" value="0" readonly>
+    <br>
+    <label>Total Earned</label>
+    <br>
+    <input placeholder="Total" type="text" id="earned" readonly>
+    <br>
+    <label>Total Used</label>
+    <br>
+    <input placeholder="Total" type="text" id="used" readonly>
+    <br>
+    <label>Profit Made</label>
+    <br>
+    <input placeholder="Profit" type="text" id="profit" readonly>
+    <br>
+    <button onclick="resetAllData">Reset Data</button>
+    <button onclick="logout()" style="background-color:#ff4444">logout</button>
+    <br>
+</body>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAFAkRqypDZWcTrliYlg67w_hs1--B5U7M",
+        authDomain: "easydeviceug.firebaseapp.com",
+        databaseURL: "https://easydeviceug-default-rtdb.firebaseio.com",
+        projectId: "easydeviceug",
+        storageBucket: "easydeviceug.firebasestorage.app",
+        messagingSenderId: "466308837564",
+        appId: "1:466308837564:web:6ce3d43f7967f224a720b9",
+        measurementId: "G-91TJG4SML9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const formatMoney = (num) => Number(num).toLocaleString('en-US');
+
+    const defaultPrices = {
+        "CAMON50":{buyingPrice:989000,sellingPrice:1120000,available:0},
+        "POP10C":{buyingPrice:292000,sellingPrice:330000,available:0},
+        "ITEL SIGNAL 10":{buyingPrice:33000,sellingPrice:45000,available:0},
+        "POP20(64)":{buyingPrice:355000,sellingPrice:390000,available:0},
+        "POP20(128)":{buyingPrice:417000,sellingPrice:460000,available:0},
+        "SPARK40(128)":{buyingPrice:443000,sellingPrice:490000,available:0},
+        "SPARK40PRO":{buyingPrice:719000,sellingPrice:820000,available:0},
+        "SPARK40PRO+":{buyingPrice:755000,sellingPrice:855000,available:0},
+        "CAMON50PRO":{buyingPrice:1090000,sellingPrice:1190000,available:0},
+        "SMART10":{buyingPrice:307000,sellingPrice:340000,available:0},
+        "SMART10+":{buyingPrice:395000,sellingPrice:440000,available:0},
+        "HOT60I":{buyingPrice:435000,sellingPrice:480000,available:0},
+        "HOT40PRO":{buyingPrice:620000,sellingPrice:690000,available:0},
+        "REDMI A5(64)":{buyingPrice:289000,sellingPrice:320000,available:0},
+        "REDMI A5(128)":{buyingPrice:366000,sellingPrice:420000,available:0,},
+        "REDMI 15C(256)":{buyingPrice:545000,sellingPrice:620000,available:0,},
+        "REDMI 15C(128)":{buyingPrice:439000,sellingPrice:500000,available:0},
+        "T485":{buyingPrice:106000,sellingPrice:150000,available:0},
+        "T403":{buyingPrice:56000,sellingPrice:70000,available:0},
+        "T101":{buyingPrice:35500,sellingPrice:45000,available:0},
+        "T102":{buyingPrice:35000,sellingPrice:45000,available:0},
+        "T302":{buyingPrice:36000,sellingPrice:50000,available:0},
+        "T315":{buyingPrice:52500,sellingPrice:65000,available:0},
+        "T353":{buyingPrice:55500,sellingPrice:70000,available:0},
+        "T352":{buyingPrice:42000,sellingPrice:55000,available:0},
+        "T313":{buyingPrice:58000,sellingPrice:70000,available:0},
+        "T316":{buyingPrice:50000,sellingPrice:60000,available:0},
+        "T303":{buyingPrice:40500,sellingPrice:60000,available:0},
+        "T528":{buyingPrice:60000,sellingPrice:70000,available:0},
+        "T455":{buyingPrice:64000,sellingPrice:75000,available:0,},
+        "CALL BOX":{buyingPrice:100000,sellingPrice:120000,available:0},
+        "ITEL 2160":{buyingPrice:31000,sellingPrice:40000,available:0},
+        "ITEL 5606":{buyingPrice:40000,sellingPrice:45000,available:0},
+        "ITEL 5627":{buyingPrice:63000,sellingPrice:75000,available:0},
+        "ITEL 2163":{buyingPrice:24500,sellingPrice:30000,available:0,},
+        "ITEL 2165":{buyingPrice:24500,sellingPrice:30000,available:0,},
+        "ITEL 2176":{buyingPrice:28000,sellingPrice:40000,available:0,},
+        "ITEL 3010":{buyingPrice:33000,sellingPrice:45000,available:0,},
+        "ITEL 5032":{buyingPrice:38000,sellingPrice:50000,available:0,},
+        "ITEL 5027":{buyingPrice:39000,sellingPrice:50000,available:0,},
+        "ITEL A100C(64)":{buyingPrice:284000,sellingPrice:310000,available:0},
+        "ITEL A100C(128)":{buyingPrice:264000,sellingPrice:300000,available:0},
+        "ITEL A06":{buyingPrice:238000,sellingPrice:260000,available:0},
+        "ITEL A90(128)":{buyingPrice:265000,sellingPrice:300000,available:0},
+        "TECNO POWER BANK 10000mAh":{buyingPrice:34000,sellingPrice:50000,available:0},
+        "TECNO POWER BANK 20000mAh":{buyingPrice:62000,sellingPrice:85000,available:0},
+        "BUD 4AIR":{buyingPrice:28000,sellingPrice:40000,available:0},
+        "SMART USB TECNO":{buyingPrice:2500,sellingPrice:5000,available:0},
+        "TYPE C USB TECNO":{buyingPrice:4000,sellingPrice:10000,available:0},
+        "SMART WATCH TECNO":{buyingPrice:66000,sellingPrice:89000,available:0},
+        "TECNO FOLDABLE CHARGER":{buyingPrice:8500,sellingPrice:20000,available:0},
+        "33W TECNO CHARGER":{buyingPrice:20500,sellingPrice:35000,available:0},
+        "ITEL 5W CHARGER":{buyingPrice:4500,sellingPrice:15000,available:0},
+        "ITEL 18W CHARGER":{buyingPrice:5500,sellingPrice:15000,available:0},
+        "ITEL EARPHONES":{buyingPrice:3500,sellingPrice:8000,available:0},
+        "H2 SCREEN GUARD":{buyingPrice:6000,sellingPrice:20000,available:0},
+        "GLASS SCREEN GUARD":{buyingPrice:1000,sellingPrice:5000,available:0},
+        "STICKERS":{buyingPrice:4000,sellingPrice:10000,available:0},
+        "COVERS":{buyingPrice:3500,sellingPrice:10000,available:0}
+    };
+
+    let liveProductData = {}; 
+
+    const getUser = () => {
+        const user = localStorage.getItem("loggedInUser");
+        if (!user) {
+            const name = prompt("Please enter your Shop Name:");
+            if(name) localStorage.setItem("loggedInUser", name);
+            return name || "guest";
+        }
+        return user;
+    };
+
+    window.updatePrice = function() {
+        const selectedValue = document.getElementById("name").value;
+        console.log("Checking price for:", selectedValue);
+        if (selectedValue === "select") {
+            document.getElementById("buying").value = "";
+            document.getElementById("selling").value = "";
+            document.getElementById("balance").value = 0;
+            return;
+        }
+        let item = liveProductData[selectedValue] || defaultPrices[selectedValue];
+        if (item) {
+            document.getElementById("buying").value = Number(item.buyingPrice) || 0;
+            document.getElementById("selling").value = Number(item.sellingPrice) || 0;
+            document.getElementById("balance").value = Number(item.available) || 0;
+        }
+    };
+
+    window.calculate = function() {
+        const buying = Number(document.getElementById("buying").value) || 0;
+        const selling = Number(document.getElementById("selling").value) || 0;
+        const added = Number(document.getElementById("added").value) || 0;
+        const sold = Number(document.getElementById("sold").value) || 0;
+        const available = Number(document.getElementById("balance").value) || 0;
+
+        document.getElementById("amountEarned").value = selling * sold;
+        document.getElementById("amountUsed").value = buying * added;
+        
+        const remaining = available + added - sold;
+        document.getElementById("remaining").value = remaining < 0 ? 0 : remaining;
+    };
+
+    window.saveProduct = async function() {
+        const user = getUser();
+        const product = document.getElementById("name").value;
+        if (product === "select") return alert("Please select a product first");
+
+        const remaining = Number(document.getElementById("remaining").value);
+        const newData = {
+            buyingPrice: Number(document.getElementById("buying").value),
+            sellingPrice: Number(document.getElementById("selling").value),
+            available: remaining
+        };
+
+        try {
+            await set(ref(db, `users/${user}/products/${product}`), newData);
+            liveProductData[product] = newData; 
+            document.getElementById("balance").value = remaining;
+
+            // Clear inputs
+            ["added", "sold", "expenses", "remaining", "amountUsed", "amountEarned"].forEach(id => {
+                document.getElementById(id).value = "";
+            });
+            alert("Stock Saved Successfully!");
+        } catch (e) {
+            alert("Error saving: " + e.message);
+        }
+    };
+
+    window.shopCalculation = function() {
+        const clean = (id) => Number(document.getElementById(id).value.replace(/,/g, '')) || 0;
+        
+        let totalEarned = clean("earned") + clean("amountEarned");
+        let totalUsed = clean("used") + clean("amountUsed");
+        let expenses = Number(document.getElementById("expenses").value) || 0;
+        let totalStock = Number(document.getElementById("remaining").value) || clean("balance");
+
+        document.getElementById("earned").value = formatMoney(totalEarned);
+        document.getElementById("used").value = formatMoney(totalUsed);
+        document.getElementById("profit").value = formatMoney(totalEarned - totalUsed - expenses);
+        document.getElementById("total").value = totalStock;
+    };
+
+    async function syncProductData() {
+        const user = getUser();
+        try {
+            const snapshot = await get(ref(db, `users/${user}/products`));
+            if (snapshot.exists()) liveProductData = snapshot.val();
+        } catch (e) { console.error("Sync Error:", e); }
+    }
+
+    window.saveShopValue = async function() {
+        const user = getUser();
+        const clean = (id) => Number(document.getElementById(id).value.replace(/,/g, '')) || 0;
+        const shopData = {
+            total: Number(document.getElementById("total").value) || 0,
+            earned: clean("earned"),
+            used: clean("used"),
+            profit: clean("profit")
+        };
+        await set(ref(db, `users/${user}/shopTotals`), shopData);
+    };
+
+    window.loadShopValue = async function() {
+        const user = getUser();
+        try {
+            const snapshot = await get(ref(db, `users/${user}/shopTotals`));
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                document.getElementById("total").value = data.total || 0;
+                document.getElementById("earned").value = formatMoney(data.earned || 0);
+                document.getElementById("used").value = formatMoney(data.used || 0);
+                document.getElementById("profit").value = formatMoney(data.profit || 0);
+            }
+        } catch (e) { console.error("Load Error:", e); }
+    };
+
+    window.onload = async function() {
+        const user = localStorage.getItem("loggedInUser");
+        if(!user) {
+            alert("Please login first");
+            window.location.href="index.html";
+            return;
+        }
+        await Promise.all([syncProductData(), loadShopValue()]);
+        console.log("App Ready. All data synced");
+    };
+
+    window.logout = () => { localStorage.removeItem("loggedInUser"); location.reload(); };
+    window.resetAllData = () => {
+        if(confirm("Reset all data?")) set(ref(db, "users/" + getUser()), null).then(() => location.reload());
+    };
+
+    function resetAllData() {
+        //const user = "mainUser";
+        const user = getUser();
+        set(ref(db, "users/" + user), null)
+            .then(() => {
+                alert("Data reset successfully")
+            });
+    }
+    window.resetAllData = resetAllData;
+    
+</script>
+</html>
